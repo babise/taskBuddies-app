@@ -44,6 +44,8 @@ class TaskService {
       headers: headers,
       body: json.encode(requestData),
     );
+    print('Request data: $requestData');
+
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       // Une erreur s'est produite lors de l'ajout de la tâche

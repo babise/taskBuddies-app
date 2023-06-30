@@ -21,18 +21,60 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   int? _selectedDayOfMonth;
   int? _selectedInterval;
 
+
   Future<void> _addTask() async {
     try {
       final List<Map<String, dynamic>> recurrences = [];
-      // ... Rest of the code for preparing recurrences (unchanged)
+
+      if (_recurrenceType == 'Unique') {
+        final Map<String, dynamic> recurrenceData = {
+          'start_date': _startDate?.toIso8601String(),
+          'end_date': null,
+          'day_of_week': null,
+          'day_of_month': null,
+          'recurrence_interval': null
+        };
+        recurrences.add(recurrenceData);
+      } else if (_recurrenceType == 'Semaine') {
+        for (int i = 0; i < _selectedWeekDays.length; i++) {
+          if (_selectedWeekDays[i]) {
+            final Map<String, dynamic> recurrenceData = {
+              'start_date': _startDate?.toIso8601String(),
+              'end_date': _endDate?.toIso8601String(),
+              'day_of_week': i + 1, // 1 for Monday, 2 for Tuesday, ...
+              'day_of_month': null,
+              'recurrence_interval': null
+            };
+            recurrences.add(recurrenceData);
+          }
+        }
+      } else if (_recurrenceType == 'Mois') {
+        final Map<String, dynamic> recurrenceData = {
+          'start_date': _startDate?.toIso8601String(),
+          'end_date': _endDate?.toIso8601String(),
+          'day_of_week': null,
+          'day_of_month': _selectedDayOfMonth,
+          'recurrence_interval': null
+        };
+        recurrences.add(recurrenceData);
+      } else if (_recurrenceType == 'Intervalle') {
+        final Map<String, dynamic> recurrenceData = {
+          'start_date': _startDate?.toIso8601String(),
+          'end_date': _endDate?.toIso8601String(),
+          'day_of_week': null,
+          'day_of_month': null,
+          'recurrence_interval': _selectedInterval
+        };
+        recurrences.add(recurrenceData);
+      }
 
       TaskService taskService = TaskService(token: widget.token);
       await taskService.addTask(title: _titleController.text, recurrences: recurrences);
 
-      // La tâche a été ajoutée avec succès
+      // Task has been added successfully
       Navigator.pop(context);
     } catch (e) {
-      // Une erreur s'est produite lors de l'ajout de la tâche
+      // Error occurred while adding the task
       showDialog(
         context: context,
         builder: (context) {
@@ -43,6 +85,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       );
     }
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +230,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             ElevatedButton(
               onPressed: () {
                 _addTask();
+
               },
               child: Text('Ajouter'),
             ),
