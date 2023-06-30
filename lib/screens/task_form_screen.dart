@@ -89,7 +89,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +123,31 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               }).toList(),
             ),
             SizedBox(height: 16),
-            if (_recurrenceType == 'Semaine') ...[
+            if (_recurrenceType == 'Unique') ...[
+              InkWell(
+                onTap: () async {
+                  final DateTime? selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _startDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (selectedDate != null && selectedDate != _startDate) {
+                    setState(() {
+                      _startDate = selectedDate;
+                    });
+                  }
+                },
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'Date de début',
+                  ),
+                  child: Text(_startDate == null
+                      ? 'Sélectionnez une date'
+                      : _startDate!.toLocal().toString().split(' ')[0]),
+                ),
+              ),
+            ] else if (_recurrenceType == 'Semaine') ...[
               ToggleButtons(
                 children: [
                   Text("L"),
@@ -230,7 +253,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             ElevatedButton(
               onPressed: () {
                 _addTask();
-
               },
               child: Text('Ajouter'),
             ),
@@ -240,3 +262,4 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     );
   }
 }
+
